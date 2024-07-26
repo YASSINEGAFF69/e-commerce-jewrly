@@ -4,10 +4,10 @@ import { deskTool } from 'sanity/desk';
 import schemas from './sanity/schemas';
 
 const config = defineConfig({
-  projectId: "de9cdbqa",
+  projectId: "64h5otbo",
   dataset: "production",
-  title: "artshop",
-  apiVersion: "2023-11-21",
+  title: "jewrly",
+  apiVersion: "2024-07-25",
   basePath: "/admin",
   plugins: [deskTool()],
   schema: { types: schemas },

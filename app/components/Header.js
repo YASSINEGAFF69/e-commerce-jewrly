@@ -14,14 +14,13 @@ function Header() {
          
         <Link href="/">
         <div className="flex items-center cursor-pointer">
-        <Image src="/logo.png" alt="logo" width={50} height={50} />
-        <h1 className="ml-2 text-2xl lg:text-3xl font-bold">Artistry Market</h1>
+        <h1 className="ml-2 text-2xl lg:text-3xl font-bold">khit and beads</h1>
         </div>
         </Link>
 
         <div className="flex items-center relative">
             <Link href="/cart">
-             <FaShoppingCart className="text-3xl text-[#5B20B6] cursor-pointer hover:scale-125 transition-transform duration-300" />
+             <FaShoppingCart className="text-3xl text-[#6E4F3F] cursor-pointer hover:scale-125 transition-transform duration-300" />
             </Link>
              {
                   totalItems > 0 && (
@@ -31,9 +30,7 @@ function Header() {
                   )
              }
 
-             <Link className="ml-4" href="/order">
-              <MdLocalShipping className="text-3xl text-[#5B20B6] cursor-pointer hover:scale-125 transition-transform duration-300" />
-              </Link>
+             
 
             <div className="ml-4">
             <UserButton  afterSignOutUrl="/"/>

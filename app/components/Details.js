@@ -23,12 +23,12 @@ function Details({ product }) {
         </div>
         {/* right */}
         <div className="flex flex-col p-6 justify-between">
-          <h1 className="text-3xl font-semibold text-[#5B20B6]">{product?.name}</h1>
+          <h1 className="text-3xl font-semibold text-[#6E4F3F]">{product?.name}</h1>
           <p className="text-lg text-gray-500 mt-4">{product?.description}</p>
 
           <div className="mt-5">
             {/* Additional details can be added here */}
-            <span className="text-[#5B20B6] text-xl font-semibold">${product?.price}</span>
+            <span className="text-[#6E4F3F] text-xl font-semibold">{product?.price} DT</span>
           </div>
 
           <div className="mt-6 flex flex-col text-gray-500">
@@ -45,7 +45,7 @@ function Details({ product }) {
 
           
           <div className="mt-6">
-            <button onClick={handleAddToCart} className="bg-[#5B20B6] text-white px-6 py-3 rounded-md">
+            <button onClick={handleAddToCart} className="bg-[#6E4F3F] text-white px-6 py-3 rounded-md">
               Add to Cart
             </button>
           </div>

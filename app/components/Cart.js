@@ -1,69 +1,76 @@
-"use client"
+"use client";
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import { FaTrash } from 'react-icons/fa';
-import useCartStore from "../cartStore"
+import useCartStore from "../cartStore";
 import Link from 'next/link';
-import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import axios from "axios";
-import { createOrder } from '@/sanity/sanity-utils';
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { db, collection, addDoc, serverTimestamp } from '@/firebase';
 
 function Cart() {
   const cart = useCartStore((state) => state.cart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const totalItems = useCartStore((state) => state.totalItems);
   const cartTotal = useCartStore((state) => state.cartTotal);
-  const { isLoaded, isSignedIn, user } = useUser();
+  const { user } = useUser();
   const router = useRouter();
-  
+
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    firstName: '',
+    lastName: '',
+    address: '',
+    postalCode: '',
+    city: '',
+    phone: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRemoveFromCart = (productId) => {
     removeFromCart(productId);
-  }
+  };
 
-  const stripe = useStripe();
-  const elements = useElements();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDeliveryDetails({
+      ...deliveryDetails,
+      [name]: value,
+    });
+  };
 
-  const onSubmit = async () => {
-    
-    const cardElement = elements?.getElement("card");
-    
+  const handleCheckout = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      if (!stripe || !cardElement) return null;
-      const  data  = await axios.post("/api/stripe", {
-        data: { amount: cartTotal.toFixed(0) },
-      });
-
-      console.log(data);
-      const res = await stripe?.confirmCardPayment(data?.data?.intent, {
-        payment_method: { card: cardElement },
-      });
-      //console.log(res.paymentIntent.status);
-      const status = res?.paymentIntent?.status;
-      if (status === 'succeeded') {
-        toast.success('Payment Successful');
-        const email = user?.emailAddresses[0]?.emailAddress;
-
-        if(email){
-          const res = await createOrder(email,cart);
-          if(res) {
-          router.push("/order");
-          }
-        }
-        
+      const email = user?.emailAddresses[0]?.emailAddress;
+      if (email) {
+        await addDoc(collection(db, "orders"), {
+          email: email,
+          cart: cart.map(item => ({
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          })),
+          deliveryDetails: {
+            ...deliveryDetails
+          },
+          status: "Pending",
+          createdAt: serverTimestamp()
+        });
+        toast.success('Order placed successfully');
+      } else {
+        toast.error('User email not found');
       }
     } catch (error) {
-      console.log(error);
-      toast.error('Payment Failed');
+      console.error(error);
+      toast.error('Order placement failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-
-  
   return (
     <div className='max-w-3xl mx-auto mt-20'>
       <h1 className="text-3xl text-center font-semibold text-[#5B20B6] mb-6">{totalItems} items in Cart</h1>
@@ -87,7 +94,7 @@ function Cart() {
               <td className="py-2 px-4">{product?.quantity}</td>
               <td className="py-2 px-4">${product?.price}</td>
               <td className="py-2 px-4">
-                <FaTrash onClick={()=>{handleRemoveFromCart(product?._id)}} className="text-[#5B20B6] mx-auto cursor-pointer" />
+                <FaTrash onClick={() => handleRemoveFromCart(product?._id)} className="text-[#5B20B6] mx-auto cursor-pointer" />
               </td>
             </tr>
           ))}
@@ -99,23 +106,45 @@ function Cart() {
         <p className="text-lg font-semibold text-right mr-4">Total: ${cartTotal}</p>
       </div>
 
-          <div className='mt-10 p-10 bg-gray-100'>
-          <CardElement />
+      {/* Delivery Form Section */}
+      <div className='mt-10 p-10 bg-gray-100'>
+        <form onSubmit={handleCheckout} className='space-y-4'>
+          <div>
+            <label className="block text-[#5B20B6]">First name (optional)</label>
+            <input type="text" name="firstName" value={deliveryDetails.firstName} onChange={handleChange} className="w-full border rounded p-2" />
           </div>
-       
-          <div className="mt-6 text-[#5B20B6] max-w-sm mx-auto space-y-4">
-           <button disabled={cartTotal === 0} onClick={onSubmit} className="text-lg w-full font-semibold text-center mr-4 bg-[#5B20B6]  text-white py-2 px-4 rounded hover:text-[#5B20B6] hover:bg-white border border-[#5B20B6]">
-            Checkout
-          </button>  
-            
-         
-          <button className="text-lg w-full font-semibold text-center mr-4 bg-white hover:bg-[#5B20B6] hover:text-white text-[#5B20B6] border border-[#5B20B6] py-2 px-4 rounded">
-          <Link className='' href="/">
-            Back to Shopping
-            </Link>  
-          </button>  
-         
-     </div>
+          <div>
+            <label className="block text-[#5B20B6]">Last name</label>
+            <input type="text" name="lastName" value={deliveryDetails.lastName} onChange={handleChange} className="w-full border rounded p-2" required />
+          </div>
+          <div>
+            <label className="block text-[#5B20B6]">Address</label>
+            <input type="text" name="address" value={deliveryDetails.address} onChange={handleChange} className="w-full border rounded p-2" required />
+          </div>
+          <div>
+            <label className="block text-[#5B20B6]">Postal code (optional)</label>
+            <input type="text" name="postalCode" value={deliveryDetails.postalCode} onChange={handleChange} className="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label className="block text-[#5B20B6]">City</label>
+            <input type="text" name="city" value={deliveryDetails.city} onChange={handleChange} className="w-full border rounded p-2" required />
+          </div>
+          <div>
+            <label className="block text-[#5B20B6]">Phone</label>
+            <input type="text" name="phone" value={deliveryDetails.phone} onChange={handleChange} className="w-full border rounded p-2" required />
+          </div>
+
+          <button type="submit" disabled={isSubmitting || cartTotal === 0 || !deliveryDetails.address} className="text-lg w-full font-semibold text-center mr-4 bg-[#5B20B6] text-white py-2 px-4 rounded hover:text-[#5B20B6] hover:bg-white border border-[#5B20B6]">
+            {isSubmitting ? "Processing..." : "Checkout"}
+          </button>
+        </form>
+      </div>
+
+      <div className="mt-6 text-[#5B20B6] max-w-sm mx-auto space-y-4">
+        <button className="text-lg w-full font-semibold text-center mr-4 bg-white hover:bg-[#5B20B6] hover:text-white text-[#5B20B6] border border-[#5B20B6] py-2 px-4 rounded">
+          <Link href="/">Back to Shopping</Link>
+        </button>
+      </div>
     </div>
   );
 }
