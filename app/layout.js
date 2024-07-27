@@ -8,7 +8,7 @@ const josefin = Josefin_Sans({ subsets: ['latin'] })
 
 export const metadata = {
   title: 'khit and beads',
-  description: 'Art Shop Called Artistry Market',
+  description: 'Art Shop ',
 }
 
 export default function RootLayout({ children }) {

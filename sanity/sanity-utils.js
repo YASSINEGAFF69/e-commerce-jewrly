@@ -12,33 +12,25 @@ const client = createClient({
 // Function to get orders by email and sort by the latest
 export async function getOrdersByEmail(email) {
   try {
-    // Query orders from Sanity with a GROQ query
     const orders = await client.fetch(
       `*[_type == 'order' && email == $email] | order(createdAt desc)`,
       { email }
     );
-
-    // Return the sorted orders
     return orders;
   } catch (error) {
-    // Handle errors appropriately
     console.error('Error getting orders:', error.message);
     throw new Error('Failed to get orders');
   }
 }
 
-export async function createOrder(email,cart) {
-  console.log(email,cart);
+// Function to create orders
+export async function createOrder(email, cart) {
   try {
-    // Create an array to store the promises for creating each order
     const orderCreationPromises = [];
 
-    // Iterate over the orderDataArray and create a promise for each order
     cart.forEach((orderData) => {
-      // Extract order data
-      const { name, quantity, price} = orderData;
+      const { name, quantity, price } = orderData;
 
-      // Create a promise for creating each order
       const orderCreationPromise = client.create({
         _type: 'order',
         name,
@@ -50,22 +42,18 @@ export async function createOrder(email,cart) {
         createdAt: new Date().toISOString(),
       });
 
-      // Add the promise to the array
       orderCreationPromises.push(orderCreationPromise);
     });
 
-    // Wait for all order creation promises to resolve
     const createdOrders = await Promise.all(orderCreationPromises);
-
-    // Return the created orders
     return createdOrders;
   } catch (error) {
-    // Handle errors appropriately
     console.error('Error creating order:', error.message);
     throw new Error('Failed to create order');
   }
 }
 
+// Function to get product by slug
 export async function getProductBySlug(slug) {
   return client.fetch(
     groq`*[_type == "product" && slug.current == $slug]{
@@ -75,14 +63,14 @@ export async function getProductBySlug(slug) {
       slug,
       description,
       price,
-      "image": image.asset->url,
+      "images": image[].asset->url,
       "slug": slug.current,
     }`,
     { slug }
   );
 }
 
-
+// Function to get all products
 export async function getProducts() {
   return client.fetch(
     groq`*[_type == "product"]{
@@ -92,47 +80,45 @@ export async function getProducts() {
       slug,
       description,
       price,
-      "image":image.asset->url,
+      "images": image[].asset->url,
       "slug": slug.current,
     }`
   );
 }
 
+// Function to get all users
 export async function getUsers() {
-    return client.fetch(
-      groq`*[_type == "user"]{
-        _id,
-        createdAt,
-        name,
-        email
-      }`
-    );
-  }
-  
-  export async function getUserByEmail(email) {
-    return client.fetch(
-      groq`*[_type == "user" && email == $email]{
-        _id,
-        createdAt,
-        name,
-        email
-      }`,
-      { email }
-    );
-  }
+  return client.fetch(
+    groq`*[_type == "user"]{
+      _id,
+      createdAt,
+      name,
+      email
+    }`
+  );
+}
 
+// Function to get user by email
+export async function getUserByEmail(email) {
+  return client.fetch(
+    groq`*[_type == "user" && email == $email]{
+      _id,
+      createdAt,
+      name,
+      email
+    }`,
+    { email }
+  );
+}
+
+// Function to create a new user
 export async function createUser(userData) {
   const { name, email } = userData;
-
-  // Add any additional validation or data preparation here
-
-  // Create a new user document
   const newUser = await client.create({
     _type: "user",
     name,
     email,
     createdAt: new Date().toISOString(),
   });
-
   return newUser;
 }
