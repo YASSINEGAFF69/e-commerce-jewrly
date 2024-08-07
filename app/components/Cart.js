@@ -102,8 +102,7 @@ function Cart() {
         <tbody>
           {cart?.map((product) => (
             <tr key={product?._id} className="hover:bg-gray-50 text-center border-b border-gray-300 text-[#6E4F3F]">
-              <td className="py-2 px-4 flex items-center">
-                <img className='mr-2' src={product?.image} width={50} height={30} alt="art" />
+              <td className="py-2 px-4">
                 {product?.name}
               </td>
               <td className="py-2 px-4">{product?.quantity}</td>

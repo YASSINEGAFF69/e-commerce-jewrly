@@ -1,4 +1,4 @@
-"use client";  // Add this line at the top of the file
+"use client"; // Add this line at the top of the file
 
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -8,9 +8,12 @@ function Details({ product }) {
   const addToCart = useCartStore((state) => state.addToCart);
   const [qty, setQty] = useState(1);
   const [mainImage, setMainImage] = useState(product?.images[0]);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const handleAddToCart = () => {
     addToCart({ product, quantity: qty });
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000); // Hide message after 3 seconds
   };
 
   return (
@@ -19,12 +22,12 @@ function Details({ product }) {
         {/* left */}
         <div className="relative">
           <div className="image-container">
-            <Image src={mainImage} width={400} height={400} className="product-detail-image" />
+            <Image src={mainImage} width={400} height={400} className="product-detail-image" alt="Main product image" />
           </div>
           <div className="flex mt-2 space-x-2">
             {product?.images.map((image, index) => (
               <button key={index} onClick={() => setMainImage(image)} className="relative h-24 w-24">
-                <Image src={image} className='small-image' layout="fill" objectFit="cover" alt={`Thumbnail ${index}`} />
+                <Image src={image} className="small-image" layout="fill" objectFit="cover" alt={`Thumbnail ${index}`} />
               </button>
             ))}
           </div>
@@ -47,6 +50,7 @@ function Details({ product }) {
               value={qty}
               onChange={(e) => setQty(e.target.value)}
               className="w-20 px-4 h-10 border border-gray-300 rounded-md"
+              min="1"
             />
           </div>
 
@@ -54,6 +58,11 @@ function Details({ product }) {
             <button onClick={handleAddToCart} className="bg-[#6E4F3F] text-white px-6 py-3 rounded-md">
               Add to Cart
             </button>
+            {showSuccessMessage && (
+              <div className="mt-2 text-green-500 ">
+                piece added to cartStore
+              </div>
+            )}
           </div>
         </div>
       </div>

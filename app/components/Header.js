@@ -22,7 +22,7 @@ function Header() {
             <FaShoppingCart className="text-3xl text-[#6E4F3F] cursor-pointer hover:scale-125 transition-transform duration-300" />
           </Link>
           {totalItems > 0 && (
-            <div className="ml-2 bg-[#718396] rounded-full w-5 h-5 flex items-center justify-center text-white text-xs font-semibold">
+            <div className="ml-2 bg-[#142938] rounded-full w-5 h-5 flex items-center justify-center text-white text-xs font-semibold">
               {totalItems}
             </div>
           )}
