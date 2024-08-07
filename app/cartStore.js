@@ -1,4 +1,3 @@
-// cartStore.js
 import { create } from 'zustand';
 
 const useCartStore = create((set) => ({
@@ -11,7 +10,7 @@ const useCartStore = create((set) => ({
       const newQuantity = parseInt(quantity, 10);
 
       if (newQuantity <= 0) {
-        // If the new quantity is less than or equal to zero, remove the item from the cart
+       
         const updatedCart = state.cart.filter((item) => item._id !== product._id);
         return {
           cart: updatedCart,
@@ -21,7 +20,7 @@ const useCartStore = create((set) => ({
       }
 
       if (existingProductIndex !== -1) {
-        // If the product already exists, update the quantity to the new quantity
+        
         const updatedCart = [...state.cart];
         updatedCart[existingProductIndex].quantity = newQuantity;
 
@@ -31,7 +30,6 @@ const useCartStore = create((set) => ({
           totalItems: calculateTotalItems(updatedCart),
         };
       } else {
-        // If the product doesn't exist, add it to the cart with the new quantity
         return {
           cart: [...state.cart, { ...product, quantity: newQuantity }],
           cartTotal: calculateCartTotal([...state.cart, { ...product, quantity: newQuantity }]),

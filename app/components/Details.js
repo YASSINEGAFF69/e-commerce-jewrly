@@ -1,4 +1,4 @@
-"use client"; // Add this line at the top of the file
+"use client"; 
 
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -13,7 +13,7 @@ function Details({ product }) {
   const handleAddToCart = () => {
     addToCart({ product, quantity: qty });
     setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 3000); // Hide message after 3 seconds
+    setTimeout(() => setShowSuccessMessage(false), 3000); 
   };
 
   return (

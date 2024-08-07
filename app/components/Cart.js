@@ -6,7 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { collection, addDoc, serverTimestamp, query, orderBy, getDocs } from 'firebase/firestore';
-import { db } from '@/firebase'; // Adjust the import path as needed
+import { db } from '@/firebase'; 
 
 function Cart() {
   const cart = useCartStore((state) => state.cart);
@@ -46,8 +46,8 @@ function Cart() {
     const email = user?.emailAddresses[0]?.emailAddress;
     if (email) {
       await addDoc(collection(db, "orders"), {
-        cart, // Array of product objects
-        createdAt: serverTimestamp(), // Timestamp for when the order was created
+        cart, 
+        createdAt: serverTimestamp(), 
         deliveryDetails: {
           address: deliveryDetails.address,
           city: deliveryDetails.city,
@@ -57,7 +57,7 @@ function Cart() {
           postalCode: deliveryDetails.postalCode,
           email,
         },
-        status: "pending", // Initial status
+        status: "pending", 
       });
       toast.success('Order placed successfully');
     } else {
@@ -71,7 +71,7 @@ function Cart() {
   }
 };
 
-  // Fetch and sort orders by timestamp
+  
   const fetchOrders = async () => {
     const ordersQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(ordersQuery);
@@ -82,7 +82,7 @@ function Cart() {
   React.useEffect(() => {
     fetchOrders().then(orders => {
       console.log("Sorted Orders:", orders);
-      // Handle orders as needed, e.g., set them in state
+ 
     });
   }, []);
 
